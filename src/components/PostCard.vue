@@ -10,24 +10,65 @@
         <p class="fs-5">{{ postProp.body }}</p>
 
     </div>
+
+    <!-- <div v-if="post.creatorId == account.id">
+        <button @click="destroyPost()" class="btn btn-danger">Delete Post</button>
+    </div> -->
 </template>
 
 
 <script>
 import { AppState } from '../AppState.js';
 import { Post } from '../models/Post';
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import Pop from '../utils/Pop';
+import { useRoute, useRouter } from 'vue-router';
+import { postsService } from '../services/PostsService';
+import { logger } from '../utils/Logger';
 export default {
     props: {
         postProp: { type: Post, required: true },
+
+
     },
     setup() {
+        const route = useRoute();
+        const router = useRouter();
+
+        async function getPostById() {
+            try {
+                const postId = route.params.postId;
+
+                await postsService.destroyPost(postId);
+
+            } catch (error) {
+
+                Pop.error(error)
+
+            }
+
+            onMounted(() => {
+                logger.log('post from route', route.params.postId)
+                getPostById();
+            })
+        }
         return {
-            account: computed(() => AppState.account)
+            account: computed(() => AppState.account),
 
+            async destroyPost() {
 
+                try {
 
+                    const wantsToDelete = await Pop.confirm('are you sure you want to delete?')
+                    if (!wantsToDelete) {
+                        return;
+                    }
 
+                } catch (error) {
+                    Pop.error(error)
+                }
+
+            }
         }
     }
 }

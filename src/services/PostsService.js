@@ -13,6 +13,28 @@ class PostsService {
         const newPost = res.data.map(pojo => new Post(pojo))
         AppState.posts = newPost
     }
+
+    async createPost(postData) {
+        const res = await api.post('api/blogs', postData)
+        logger.log('creating post', res.data)
+        const newPost = new Post(res.data)
+        AppState.posts = newPost
+
+    }
+
+
+    async destroyPost(postId) {
+        const res = await api.delete(`api/blogs/${postId}`)
+        logger.log('DESTROYED POST', res.data)
+    }
+
+
+    async getPostById(postId) {
+        const res = await api.delete(`api/blogs/${postId}`)
+        logger.log('got post id', res.data)
+        const newPost = new Post(res.data)
+        AppState.activePost = newPost
+    }
 }
 
 
